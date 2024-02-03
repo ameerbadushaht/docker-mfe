@@ -1,0 +1,269 @@
+
+
+
+
+
+
+# version: '3.9'
+
+# services:
+#   hostapp:
+#     build:
+#       context: ./hostApp
+#     networks:
+#       - todoMfe
+
+#   todo:
+#     build:
+#       context: ./todo
+#     networks:
+#       - todoMfe
+
+#   mfe2:
+#     build:
+#       context: ./mfe2
+#     networks:
+#       - todoMfe
+
+#   nginx:
+#     image: nginx:latest
+#     ports:
+#       - "4000:80"  # Map port 80 of the container to port 80 on the host
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf:ro  # Mount your custom Nginx config
+#     depends_on:
+#       - hostapp
+#       - todo
+#       - mfe2
+#     networks:
+#       - todoMfe
+
+# networks:
+#  todoMfe:
+#     driver: bridge  # Use a bridge network for communication
+
+
+
+###########################################################################################
+
+# version: '3.7'
+# services:
+
+#   nginx1:
+#     image: nginx:alpine
+#     ports:
+#      - "80:80"
+#     volumes:
+#     #  - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#       - ./hostApp/nginx.conf:/etc/nginx/nginx.conf
+#     depends_on:
+#      - hostApp
+#     networks: 
+#       # - todoMfe
+#       todoMfe:
+#         ipv4_address: 172.22.0.2
+
+
+#   nginx2:
+#     image: nginx:alpine
+#     ports:
+#      - "81:80"
+#     volumes:
+#     #  - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#       - ./mfe2/nginx.conf:/etc/nginx/nginx.conf
+#     depends_on:
+#      - mfe2
+#     networks: 
+#       - todoMfe
+#       # todoMfe:
+#       #   ipv4_address: 172.22.0.3
+
+
+#   nginx3:
+#     image: nginx:alpine
+#     ports:
+#      - "82:80"
+#     volumes:
+#     #  - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#       - ./todo/nginx.conf:/etc/nginx/nginx.conf
+#     depends_on:
+#      - todo
+#     networks: 
+#       - todoMfe
+#       # todoMfe:
+#       #   ipv4_address: 172.22.0.4
+
+
+#   hostApp:
+#     image: host-app 
+#     ports: 
+#      - "8080:80"
+#     networks: 
+#      - todoMfe
+#       # todoMfe:
+#       #   ipv4_address: 172.22.0.5
+
+
+#   todo: 
+#     image: todo
+#     ports: 
+#      - "8081:80"
+#     networks: 
+#      - todoMfe
+#       # todoMfe:
+#       #   ipv4_address: 172.22.0.6
+
+
+#   mfe2: 
+#     image: mfe2
+#     ports: 
+#      - "8082:80"
+#     networks: 
+#      - todoMfe
+#       # todoMfe:
+#       #   ipv4_address: 172.22.0.7
+  
+
+# networks:
+#   todoMfe:
+#     driver: bridge 
+#     # ipam:
+#     #   driver: default
+#     #   config:
+#     #     - subnet: 172.22.0.0/16
+
+
+####################### updated #############
+   
+version: '3.7'
+services:
+
+  nginx:
+    image: nginx:alpine
+    ports:
+     - "80:80"
+    volumes:
+     - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      # - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+     - hostApp
+     - mfe2
+     - todo
+    networks: 
+      - todoMfe
+    
+
+
+  hostApp:
+    image: host-app 
+    ports: 
+     - "8080:80"
+    networks: 
+     - todoMfe
+      
+
+
+  todo: 
+    image: todo
+    ports: 
+     - "8081:80"
+    networks: 
+     - todoMfe
+     
+
+
+  mfe2: 
+    image: mfe2
+    ports: 
+     - "8082:80"
+    networks: 
+     - todoMfe
+     
+  
+
+networks:
+  todoMfe:
+    driver: bridge 
+
+############################################################################
+
+  # backend: 
+  #   image: backend
+  #   ports: 
+  #    - "5000:5000"
+  #   networks:
+  #    - todoMfe
+
+# version: "3"
+# services:
+#   nginx:
+#     image: nginx
+#     ports:
+#       - "80:80"
+#     networks:
+#       - todoMfe
+#   hostapp:
+#     image: host-app
+#     networks:
+#       - todoMfe
+#   todo:
+#     image: todo
+#     networks:
+#       - todoMfe
+#   mfe2:
+#     image: mfe2
+#     networks:
+#       - todoMfe
+# networks:
+#   todoMfe:
+#     external: true
+
+
+
+# ///////////////////////////////// htttpd
+
+# version: '3.9'
+
+# services:
+#   hostapp:
+#     build:
+#       context: ./hostApp
+#     ports:
+#       - "4000:80" 
+#     networks:
+#       - mfe-todo
+#     depends_on:
+#       - todoapp
+#       - mfe2
+
+#   todoapp:
+#     build:
+#       context: ./todo
+#     networks:
+#       - mfe-todo
+#     ports:
+#       - "4001:80" 
+#     environment:
+#       - BACKEND_URL=http://localhost:5000
+
+#   mfe2:
+#     build:
+#       context: ./mfe2
+#     networks:
+#       - mfe-todo
+#     ports:
+#       - "4002:80"
+#     environment:
+#       - BACKEND_URL=http://localhost:5000
+
+#   backend:
+#     build:
+#       context: ./Backend
+#     ports:
+#       - "5000:5000"
+#     networks:
+#       - mfe-todo
+
+# networks:
+#   mfe-todo:  # Use the created network name here  
+#     external: true
